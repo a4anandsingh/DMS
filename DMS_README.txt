@@ -15,7 +15,7 @@ CREATE TABLE `dm__trigger__log` (
 	PRIMARY KEY (`id`) USING BTREE
 )
 COLLATE='utf8mb4_general_ci'
-ENGINE=MyISAM
+ENGINE=InnoDB
 AUTO_INCREMENT=1
 ;
 
@@ -30,7 +30,7 @@ CREATE TABLE `dm__files_status` (
 	PRIMARY KEY (`ID`) USING BTREE
 )
 COLLATE='latin1_swedish_ci'
-ENGINE=MyISAM
+ENGINE=InnoDB
 ROW_FORMAT=DYNAMIC
 AUTO_INCREMENT=6
 ;

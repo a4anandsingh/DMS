@@ -122,7 +122,7 @@
                 <td class="ui-widget-content" style="font-size:13px;font-weight:bold" colspan="3">
                     <input type="file" name="UPLOAD_FILE" onchange="" id="UPLOAD_FILE" accept="application/pdf" />
                     <span class="help-text">Allowed file types:<strong><?php echo $setting["FILE_EXT"]; ?></strong></span><br>
-                    <span class="help-text">Maximum upload file size is : <strong> <?php echo $setting["MAXFILESIZE"]; ?> MB</strong></span>
+                    <span class="help-text">Maximum upload file size is : <strong> <?php echo $setting["MAXFILESIZE"]; ?> KB</strong></span>
                 </td>
             </tr>
             <?php //if($arrData['ID']>0){ 
