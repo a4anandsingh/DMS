@@ -58,7 +58,7 @@ class Dms__moderator__m extends CI_Model
                 if (in_array($row->SECTION_ID, explode(",", $selectedView))) {
                     array_push($fieldValues, '"' . addslashes($this->showButton($row->ID, $row->STATUS)) . '"');
                 } else {
-                    array_push($fieldValues, '"' . addslashes('') . '"');
+                    array_push($fieldValues, '"' . addslashes('sasas') . '"');
                 }
 
               //  array_push($fieldValues, '"' . addslashes(date('F j, Y', strtotime($row->UPDATED_AT))) . '"');
@@ -101,6 +101,8 @@ class Dms__moderator__m extends CI_Model
         $fileStatus = $this->getWebsiteStatus(0);
         if (array_key_exists($status, $fileStatus)) {
             return getButton($fileStatus[$status], 'Active(1,' . $fileStatus[$status] . ')', 4, '');
+        }else{
+            return '<p class="text-danger">Sent to Publish</p>';
         }
     }
 

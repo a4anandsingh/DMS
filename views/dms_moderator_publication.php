@@ -144,7 +144,8 @@
                     echo "</pre>"; 
                     */
                     if ($getWebsiteStatus && $session->session->CLASS_NAME == "misopt") { ?>
-                        <select name="STATUS" id="STATUS" class="sel2" style="width:100%">
+                        <select name="STATUS" id="STATUS" class="sel2" style="width:100%" required>
+                            <option value="">--Select Option--</option>
                             <?php
                             foreach ($getWebsiteStatus as $k => $v) { ?>
                                 <option <?php echo ($k == $arrData['STATUS']) ? 'selected' : ''; ?> value="<?php echo $k; ?>"> <?php echo $v; ?></option>
