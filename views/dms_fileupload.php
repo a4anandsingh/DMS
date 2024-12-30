@@ -122,7 +122,7 @@
                 <td class="ui-widget-content" style="font-size:13px;font-weight:bold" colspan="3">
                     <input type="file" name="UPLOAD_FILE" onchange="" id="UPLOAD_FILE" accept="application/pdf" />
                     <span class="help-text">Allowed file types:<strong><?php echo $setting["FILE_EXT"]; ?></strong></span><br>
-                    <span class="help-text">Maximum upload file size is : <strong> <?php echo $setting["MAXFILESIZE"]; ?> KB</strong></span>
+                    <span class="help-text">Maximum upload file size is : <strong> <?php echo $setting["MAXFILESIZE"]/1024; ?> MB</strong></span>
                 </td>
             </tr>
             <?php //if($arrData['ID']>0){ 
@@ -170,13 +170,18 @@
 
 <script>
     /* Start 27th April 2022*/
-    var MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-
+    var MAX_FILE_SIZE = <?php echo $setting["MAXFILESIZE"]/1024; ?> // in MB
+                 //   alert(MAX_FILE_SIZE);
     $(document).ready(function() {
         $('#UPLOAD_FILE').change(function() {
             fileSize = this.files[0].size;
+            console.log(file);
             if (fileSize > MAX_FILE_SIZE) {
-                this.setCustomValidity("File must not exceed 5 MB!");
+                alert(`File size exceeds the maximum allowed size of ${maxFileSize / 1024 } MB.`);
+                e.preventDefault();
+            }
+            if (fileSize > MAX_FILE_SIZE) {
+                this.setCustomValidity("File must not exceed "+MAX_FILE_SIZE+' MB');
                 this.reportValidity();
             } else {
                 this.setCustomValidity("");

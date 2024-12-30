@@ -53,7 +53,7 @@ class Dms__fileupload__m extends CI_Model
             FROM ' . $this->dm__files . ' file
             LEFT JOIN ' . $this->dm__category . ' sections ON sections.ID = file.SECTION_ID
             LEFT JOIN ' . $this->dm__category . ' category ON category.ID = file.CATEGORY_ID
-            where file.STATUS <> 1 AND file.SECTION_ID IN (' . $selId . ') AND file.OFFICE_ID = ' . $officeId . ' ';
+            where file.STATUS <> 1 AND file.SECTION_ID IN (' . $selId . ') AND file.OFFICE_ID = ' . $officeId . ' ORDER BY file.ID DESC ';
         $objFilter->executeMyQuery();
         //echo $objFilter->PREPARED_SQL; //exit;
         $arr_accessLevel = array('1' => 'Public', '2' => 'Private', '3' => 'Both');

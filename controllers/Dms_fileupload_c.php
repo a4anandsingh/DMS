@@ -224,7 +224,7 @@ class Dms_fileupload_c extends MX_Controller
         }
         array_push($mfunctions, "ondblClickRow: function(ids){OperationPublished(BUTTON_MODIFY,0);}");
 
-       // var_dump($mfunctions);  
+        // var_dump($mfunctions);  
         $cols = array(
             array(
                 'label' => 'Id',
@@ -472,14 +472,14 @@ class Dms_fileupload_c extends MX_Controller
         //showArrayValues($data['category_tree']);
         //showArrayValues($data['arrData']); //exit;
         //showArrayValues($data);
-       
+
         $data['getWebsiteStatus'] = $this->Dms__moderator__m->getWebsiteStatus($userId);
         $data['requestedStatus'] = '';
         if ($this->input->post('reqStatus') == md5("PUBLISHED")) {
             $data['requestedStatus'] = 'PUBLISHED';
-         return   $this->load->view('dms/dms_moderator_publication', $data);
-         }
-       return $this->load->view('dms/dms_fileupload', $data);
+            return   $this->load->view('dms/dms_moderator_publication', $data);
+        }
+        return $this->load->view('dms/dms_fileupload', $data);
     }
 
     function showSectionEntryBox()
@@ -493,6 +493,22 @@ class Dms_fileupload_c extends MX_Controller
 
     function savedata()
     {
+        $error = false;
+        $id = $this->input->post('ID');
+        // validate file size and extention
+        if (isset($_FILES['UPLOAD_FILE'])) {
+            $response = $this->checkFileValidation($_FILES['UPLOAD_FILE']);
+
+            if ($response) {
+                // Validation failed, send error response
+                array_push($this->message, getMyArray(false, $response));
+                echo $this->createJSONResponse(false, $id, $this->message);
+                return;
+            }
+            //echo $this->createJSONResponse(false, $id, $this->message);
+        }
+
+
         $id = $this->input->post('ID');
         $FILE_NAME_ENG = $this->input->post('FILE_NAME_ENG');
         $FILE_NAME_HINDI = $this->input->post('FILE_NAME_HINDI');
@@ -533,7 +549,7 @@ class Dms_fileupload_c extends MX_Controller
             'OFFICE_ID' => $officeId,
             'USER_CLASS_ID' => $userclassId
         );
-        //showArrayValues($insert_data);exit();
+        // showArrayValues($insert_data);exit();
         $insertId = 0;
         if ($id == 0) {
             $this->db->insert('dm__files', array_merge($insert_data, $insert_arr));
@@ -548,7 +564,7 @@ class Dms_fileupload_c extends MX_Controller
         } else {
             array_push($this->message, getMyArray(false, "Data Inserted successfully."));
         }
-        $error = false;
+
         //if file uploaded true
         if ($_FILES['UPLOAD_FILE']['error'] == 0) {
             // Get section name
@@ -714,7 +730,7 @@ class Dms_fileupload_c extends MX_Controller
             //file_exists($source) {
 
 
-            unlink(FCPATH . $fileTobeDeleted);
+            // unlink(FCPATH . $fileTobeDeleted); 
             //rmdir(FCPATH.$fileTobeDeleted);
             //}
             //rmdir(FCPATH.$source);
@@ -803,5 +819,26 @@ class Dms_fileupload_c extends MX_Controller
         $data = array('ID' => $this->input->post('id'), 'STATUS' => $this->input->post('status'));
         echo $this->Dms__fileupload__m->Active($data);
     }
-    
+
+
+    function checkFileValidation($file)
+    {
+        // Fetch file settings from the model
+        $setting = $this->Dms__fileupload__m->getUserFilesSetting();
+        $maxFileSize = $setting["MAXFILESIZE"] * 1000; // Maximum file size in bytes
+        $allowedExtensions = explode('|', $setting["FILE_EXT"]); // Allowed file extensions as an array
+
+        // Check file size
+        if ($file['size'] > $maxFileSize) {
+            return "File size exceeds the maximum allowed size of " . ($setting["MAXFILESIZE"]) . " KB.";
+        }
+
+        // Check file extension
+        /*   $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($fileExtension, $allowedExtensions)) {
+            return "Invalid file type. Only the following extensions are allowed: " . implode(", ", $allowedExtensions) . ".";
+        }
+    */
+        return null; // Validation passed
+    }
 }
