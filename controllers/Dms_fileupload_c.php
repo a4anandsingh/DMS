@@ -820,7 +820,7 @@ class Dms_fileupload_c extends MX_Controller
         echo $this->Dms__fileupload__m->Active($data);
     }
 
-
+    //Added by Pawan 30/12/2024 
     function checkFileValidation($file)
     {
         // Fetch file settings from the model
@@ -828,17 +828,18 @@ class Dms_fileupload_c extends MX_Controller
         $maxFileSize = $setting["MAXFILESIZE"] * 1000; // Maximum file size in bytes
         $allowedExtensions = explode('|', $setting["FILE_EXT"]); // Allowed file extensions as an array
 
+        // Check file extension
+        $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($fileExtension, $allowedExtensions)) {
+            return "Invalid file type. Only the following extensions are allowed: " . implode(", ", $allowedExtensions) . ".";
+        }
+
         // Check file size
         if ($file['size'] > $maxFileSize) {
             return "File size exceeds the maximum allowed size of " . ($setting["MAXFILESIZE"]) . " KB.";
         }
 
-        // Check file extension
-        /*   $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        if (!in_array($fileExtension, $allowedExtensions)) {
-            return "Invalid file type. Only the following extensions are allowed: " . implode(", ", $allowedExtensions) . ".";
-        }
-    */
+
         return null; // Validation passed
     }
 }
