@@ -495,21 +495,6 @@ class Dms_fileupload_c extends MX_Controller
     {
         $error = false;
         $id = $this->input->post('ID');
-        // validate file size and extention
-        if (isset($_FILES['UPLOAD_FILE'])) {
-            $response = $this->checkFileValidation($_FILES['UPLOAD_FILE']);
-
-            if ($response) {
-                // Validation failed, send error response
-                array_push($this->message, getMyArray(false, $response));
-                echo $this->createJSONResponse(false, $id, $this->message);
-                return;
-            }
-            //echo $this->createJSONResponse(false, $id, $this->message);
-        }
-
-
-        $id = $this->input->post('ID');
         $FILE_NAME_ENG = $this->input->post('FILE_NAME_ENG');
         $FILE_NAME_HINDI = $this->input->post('FILE_NAME_HINDI');
         $FILE_DESCRIPTION = $this->input->post('FILE_DESCRIPTION');
@@ -529,41 +514,6 @@ class Dms_fileupload_c extends MX_Controller
             'SECTION_ID' => $sectionId,
             'CATEGORY_ID' => $categoryId
         );
-
-        $insert_data = array(
-            'FILE_NAME_ENG' => $this->input->post('FILE_NAME_ENG'),
-            'FILE_NAME_HINDI' => $this->input->post('FILE_NAME_HINDI'),
-            'FILE_DESCRIPTION' => $this->input->post('FILE_DESCRIPTION'),
-            'FILE_DESCRIPTION_HINDI' => $this->input->post('FILE_DESCRIPTION_HINDI'),
-            'LETTER_NO' => $this->input->post('LETTER_NO'),
-            'LETTER_DATE' => $this->input->post('LETTER_DATE'),
-            'tags' => $this->input->post('tags'),
-            //'FILE_PATH'=> $UPLOAD_FILE_PATH,
-            //'USER_FILE'=>$UPLOADED_FILE,
-            'SECTION_ID' => $sectionId,
-            'CATEGORY_ID' => $categoryId,
-            'ACCESS_LEVEL' => htmlspecialchars($this->input->post('ACCESS_LEVEL')),
-            'STATUS' => htmlspecialchars($this->input->post('STATUS')),
-            'UPLOAD_DATE_TIME' => date("Y-m-d H:i:s"),
-            'USER_ID' => getSessionDataByKey('USER_ID'),
-            'OFFICE_ID' => $officeId,
-            'USER_CLASS_ID' => $userclassId
-        );
-        // showArrayValues($insert_data);exit();
-        $insertId = 0;
-        if ($id == 0) {
-            $this->db->insert('dm__files', array_merge($insert_data, $insert_arr));
-            $insertId = $this->db->insert_id();
-        } else {
-            $result = $this->db->update('dm__files', $insert_data, array('ID' => $id));
-            $insertId = $id;
-        }
-
-        if ($this->db->affected_rows()) {
-            array_push($this->message, getMyArray(true, "Data updated successfully."));
-        } else {
-            array_push($this->message, getMyArray(false, "Data Inserted successfully."));
-        }
 
         //if file uploaded true
         if ($_FILES['UPLOAD_FILE']['error'] == 0) {
@@ -595,19 +545,22 @@ class Dms_fileupload_c extends MX_Controller
 
             chmod($filePath, 0777);
             $config['upload_path']          = $filePath . DIRECTORY_SEPARATOR;
-            //$config['allowed_types']        = 'jpg|zip|pdf'; //()
             $config['allowed_types']        = $setting["FILE_EXT"]; //'jpg|zip|pdf';Added on 26th April 2022 for filetype control
             $config['encrypt_name']         = 'TRUE';
-            $config['max_filename']         = '35';
+            $config['max_filename']         = '65';
             $config['remove_spaces']        = 'TRUE';
-            //$config['max_size']           = (MAX_UPLOAD_SIZE*1024);
-            $config['max_size']           = $setting["MAXFILESIZE"]; //Added on 26th April 2022 for filetype control
+            $config['max_size']             = $setting["MAXFILESIZE"] * 1024;
             $this->load->library('upload', $config);
             $field_name = "UPLOAD_FILE";
+
             if (! $this->upload->do_upload($field_name)) {
+                //   exit('if file is not uploaded' );
                 array_push($this->message, getMyArray(false, "Upload File -" . $this->upload->display_errors()));
                 $error = true;
+                echo $this->createJSONResponse($error, $id, $this->message);
+                return;
             } else {
+
                 array_push($this->message, getMyArray(true, "File Uploaded Successfully"));
                 $UPLOAD_FILE_ARRAY = $this->upload->data();
                 $UPLOAD_FILE_PATH = $UPLOAD_FILE_ARRAY['file_name'];
@@ -678,10 +631,9 @@ class Dms_fileupload_c extends MX_Controller
                     'USER_FILE' => $UPLOADED_FILE
                 );
 
-                $result = $this->db->update('dm__files', $fileData, array('ID' => $insertId));
+                $result = $this->db->update('dm__files', $fileData, array('ID' => $id));
             }
         } else {
-
             $recs = $this->db->select("*")
                 ->from("dm__files")
                 ->where("ID", $_POST["ID"])
@@ -738,9 +690,47 @@ class Dms_fileupload_c extends MX_Controller
                 'FILE_PATH' => $UPLOAD_FILE_PATH,
                 'USER_FILE' => $rec->USER_FILE
             );
-            $result = $this->db->update('dm__files', $fileData, array('ID' => $insertId));
+            $result = $this->db->update('dm__files', $fileData, array('ID' => $id));
             //echo print_r( $fileData);	       
         }
+
+
+        $insert_data = array(
+            'FILE_NAME_ENG' => $this->input->post('FILE_NAME_ENG'),
+            'FILE_NAME_HINDI' => $this->input->post('FILE_NAME_HINDI'),
+            'FILE_DESCRIPTION' => $this->input->post('FILE_DESCRIPTION'),
+            'FILE_DESCRIPTION_HINDI' => $this->input->post('FILE_DESCRIPTION_HINDI'),
+            'LETTER_NO' => $this->input->post('LETTER_NO'),
+            'LETTER_DATE' => $this->input->post('LETTER_DATE'),
+            'tags' => $this->input->post('tags'),
+            //'FILE_PATH'=> $UPLOAD_FILE_PATH,
+            //'USER_FILE'=>$UPLOADED_FILE,
+            'SECTION_ID' => $sectionId,
+            'CATEGORY_ID' => $categoryId,
+            'ACCESS_LEVEL' => htmlspecialchars($this->input->post('ACCESS_LEVEL')),
+            'STATUS' => htmlspecialchars($this->input->post('STATUS')),
+            'UPLOAD_DATE_TIME' => date("Y-m-d H:i:s"),
+            'USER_ID' => getSessionDataByKey('USER_ID'),
+            'OFFICE_ID' => $officeId,
+            'USER_CLASS_ID' => $userclassId
+        );
+        // showArrayValues($insert_data);exit();
+        $insertId = 0;
+        if ($id == 0) {
+            $this->db->insert('dm__files', array_merge($insert_data, $insert_arr));
+            $insertId = $this->db->insert_id();
+        } else {
+            $result = $this->db->update('dm__files', $insert_data, array('ID' => $id));
+            $insertId = $id;
+        }
+
+        if ($this->db->affected_rows()) {
+            array_push($this->message, getMyArray(true, "Data updated successfully."));
+        } else {
+            array_push($this->message, getMyArray(false, "Data Inserted successfully."));
+        }
+
+
 
         //exit;
         if (!$error) {
@@ -818,28 +808,5 @@ class Dms_fileupload_c extends MX_Controller
     {
         $data = array('ID' => $this->input->post('id'), 'STATUS' => $this->input->post('status'));
         echo $this->Dms__fileupload__m->Active($data);
-    }
-
-    //Added by Pawan 30/12/2024 
-    function checkFileValidation($file)
-    {
-        // Fetch file settings from the model
-        $setting = $this->Dms__fileupload__m->getUserFilesSetting();
-        $maxFileSize = $setting["MAXFILESIZE"] * 1000; // Maximum file size in bytes
-        $allowedExtensions = explode('|', $setting["FILE_EXT"]); // Allowed file extensions as an array
-
-        // Check file extension
-        $fileExtension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        if (!in_array($fileExtension, $allowedExtensions)) {
-            return "Invalid file type. Only the following extensions are allowed: " . implode(", ", $allowedExtensions) . ".";
-        }
-
-        // Check file size
-        if ($file['size'] > $maxFileSize) {
-            return "File size exceeds the maximum allowed size of " . ($setting["MAXFILESIZE"]) . " KB.";
-        }
-
-
-        return null; // Validation passed
     }
 }

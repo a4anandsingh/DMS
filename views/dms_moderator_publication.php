@@ -151,9 +151,7 @@
                                 <option <?php echo ($k == $arrData['STATUS']) ? 'selected' : ''; ?> value="<?php echo $k; ?>"> <?php echo $v; ?></option>
                             <?php } ?>
                         </select>
-                    <?php } else {
-                        echo 'PUBLISHED';
-                    } ?>
+                    <?php } ?>
                 </td>
             </tr>
         </table>

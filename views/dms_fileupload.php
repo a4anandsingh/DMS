@@ -121,8 +121,8 @@
                         </td> End 27th April 2022 -->
                 <td class="ui-widget-content" style="font-size:13px;font-weight:bold" colspan="3">
                     <input type="file" name="UPLOAD_FILE" onchange="" id="UPLOAD_FILE" accept="application/pdf" />
-                    <span class="help-text">Allowed file types:<strong><?php echo $setting["FILE_EXT"]; ?></strong></span><br>
-                    <span class="help-text">Maximum upload file size is : <strong> <?php echo $setting["MAXFILESIZE"]/1024; ?> MB</strong></span>
+                    <span class="help-text" id="help-ext">Allowed file types:<strong><?php echo $setting["FILE_EXT"]; ?></strong></span><br>
+                    <span class="help-text" id="help-maxsize">Maximum upload file size is : <strong> <?php echo $setting["MAXFILESIZE"]; ?> MB</strong></span>
                 </td>
             </tr>
             <?php //if($arrData['ID']>0){ 
@@ -169,26 +169,19 @@
 
 
 <script>
-    /* Start 27th April 2022*/
-    var MAX_FILE_SIZE = <?php echo $setting["MAXFILESIZE"]/1024; ?> // in MB
-                 //   alert(MAX_FILE_SIZE);
-    $(document).ready(function() {
+    $().ready(function() {
+        const MAX_FILE_SIZE = <?php echo $setting["MAXFILESIZE"] * 1024 * 1024; ?> // convert MB into bytes
         $('#UPLOAD_FILE').change(function() {
-            fileSize = this.files[0].size;
-            console.log(file);
-            if (fileSize > MAX_FILE_SIZE) {
-                alert(`File size exceeds the maximum allowed size of ${maxFileSize / 1024 } MB.`);
-                e.preventDefault();
-            }
-            if (fileSize > MAX_FILE_SIZE) {
-                this.setCustomValidity("File must not exceed "+MAX_FILE_SIZE+' MB');
-                this.reportValidity();
-            } else {
-                this.setCustomValidity("");
-            }
             var fileInput = document.getElementById('UPLOAD_FILE');
-
             var filePath = fileInput.value;
+            fileSize = this.files[0].size;
+          //  console.log(MAX_FILE_SIZE +"==="+ fileSize);
+            if (fileSize > MAX_FILE_SIZE) {
+                alert(`File size exceeds the maximum allowed size of ${MAX_FILE_SIZE /1024/1024} MB.`);
+                fileInput.value = ''; // Reset the file input
+                $('#help-maxsize').css('color', 'red');
+                return false; // Prevent form submission
+            }
 
             // Allowing file type
             var allowedExtensions =
@@ -197,12 +190,16 @@
             if (!allowedExtensions.exec(filePath)) {
                 alert('Invalid file type');
                 fileInput.value = '';
+                $('#help-ext').css('color', 'red');
                 return false;
             }
+            $('#help-maxsize').css('color', 'green');
+            $('#help-ext').css('color', 'green');
+
         });
-    });
-    /* End 27th April 2022*/
-    $().ready(function() {
+
+
+
         $('.sel2').select2();
         if ($('#SECTION_ID').val()) {
             changeCategory(<?php echo $arrData['CATEGORY_ID']; ?>);
