@@ -151,6 +151,8 @@
                                 <option <?php echo ($k == $arrData['STATUS']) ? 'selected' : ''; ?> value="<?php echo $k; ?>"> <?php echo $v; ?></option>
                             <?php } ?>
                         </select>
+                    <?php }else{?>
+                        <strong class="text-success">Published</strong>
                     <?php } ?>
                 </td>
             </tr>
