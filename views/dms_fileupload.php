@@ -432,7 +432,7 @@
         allowOtherCharSets: true,
         forceUpper: false,
         forceLower: false,
-        maxLength: 100
+        maxLength: 150
     });
     $('#FILE_NAME_ENG').alphanum({
         allow: ' ',
@@ -445,7 +445,7 @@
         allowOtherCharSets: false,
         forceUpper: false,
         forceLower: false,
-        maxLength: 30
+        maxLength: 150
     });
     $('#FILE_DESCRIPTION').alphanum({
         allow: ' ',

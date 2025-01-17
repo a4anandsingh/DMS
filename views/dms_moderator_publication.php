@@ -138,11 +138,6 @@
 
                     <?php
                     $session =   $this->load->library('session');
-                    /*
-                    echo "<pre>";
-                    print_r($session->session->CLASS_NAME);
-                    echo "</pre>"; 
-                    */
                     if ($getWebsiteStatus && $session->session->CLASS_NAME == "misopt") { ?>
                         <select name="STATUS" id="STATUS" class="sel2" style="width:100%" required>
                             <option value="">--Select Option--</option>
@@ -151,9 +146,12 @@
                                 <option <?php echo ($k == $arrData['STATUS']) ? 'selected' : ''; ?> value="<?php echo $k; ?>"> <?php echo $v; ?></option>
                             <?php } ?>
                         </select>
-                    <?php }else{?>
-                        <strong class="text-success">Published</strong>
-                    <?php } ?>
+                    <?php } else {
+                        if (array_key_exists($arrData['STATUS'], $getWebsiteStatus)) {
+                            echo "<b class='text-success'>" . $arrData[0]['STATUS_NAME'] . "</b>";
+                        }
+                    } ?>
+
                 </td>
             </tr>
         </table>

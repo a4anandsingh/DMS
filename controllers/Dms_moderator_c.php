@@ -286,6 +286,7 @@ class Dms_moderator_c extends MX_Controller
 
         $fileData = array(
             'STATUS' => htmlspecialchars($this->input->post('STATUS')),
+            'UPDATED_AT' =>  date('Y-m-d H:i:s'),
         );
 
         $result = $this->db->update('dm__files', $fileData, array('ID' => $id));

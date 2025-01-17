@@ -61,7 +61,7 @@ class Dms__moderator__m extends CI_Model
                     array_push($fieldValues, '"' . addslashes('sasas') . '"');
                 }
 
-              //  array_push($fieldValues, '"' . addslashes(date('F j, Y', strtotime($row->UPDATED_AT))) . '"');
+                //  array_push($fieldValues, '"' . addslashes(date('F j, Y', strtotime($row->UPDATED_AT))) . '"');
                 array_push($fieldValues, '"' . addslashes($this->formatDateTime($row->UPDATED_AT)) . '"');
 
                 array_push($objFilter->ROWS, '{"id":"' . $row->ID . '", "cell":[' . implode(',', $fieldValues) . ']}');
@@ -101,7 +101,7 @@ class Dms__moderator__m extends CI_Model
         $fileStatus = $this->getWebsiteStatus(0);
         if (array_key_exists($status, $fileStatus)) {
             return getButton($fileStatus[$status], 'Active(1,' . $fileStatus[$status] . ')', 4, '');
-        }else{
+        } else {
             return '<p class="text-danger">Sent to Publish</p>';
         }
     }
@@ -194,13 +194,16 @@ class Dms__moderator__m extends CI_Model
                 }
             }
         } else {
-            $this->db->select('dm__files.*, sections.CATEGORY_ENG as SECTION_NAME, category.CATEGORY_ENG as CATEGORY_NAME')->from($this->dm__files);
+            $this->db->select('dm__files.*, sections.CATEGORY_ENG as SECTION_NAME, category.CATEGORY_ENG as CATEGORY_NAME, fs.STATUS_NAME')->from($this->dm__files);
             $this->db->join('dm__category sections', 'sections ON sections.ID = dm__files.SECTION_ID', 'left');
             $this->db->join('dm__category category', 'category ON category.ID = dm__files.CATEGORY_ID', 'left');
+            $this->db->join('dm__files_status fs', 'fs ON fs.STATUS = dm__files.STATUS', 'left');
+
             $this->db->where('dm__files.ID', $id);
             $recs = $this->db->get();
             $rec = $recs->row();
             $addCol = [];
+            $addCol['STATUS_NAME'] = $rec->STATUS_NAME;
             $addCol['SECTION_NAME'] = $rec->SECTION_NAME;
             $addCol['CATEGORY_NAME'] = $rec->CATEGORY_NAME;
 
@@ -214,8 +217,8 @@ class Dms__moderator__m extends CI_Model
                 $recs->free_result();
             }
         }
-        // showArrayValues($arrData);
-        //  exit;
+        /*    showArrayValues($arrData);
+          exit;  */
         return $arrData;
     }
 
@@ -309,7 +312,7 @@ class Dms__moderator__m extends CI_Model
         $rec = [];
         if ($recs && $recs->num_rows()) {
             foreach ($recs->result() as $row) {
-                $rec[$row->ID] = $row->STATUS_NAME;
+                $rec[$row->STATUS] = $row->STATUS_NAME;
             }
         }
         return $rec;
@@ -375,12 +378,12 @@ class Dms__moderator__m extends CI_Model
             $selId = $recUser->CATEGORY_SELECTED_EDIT;
         }
         //        showArrayValues($recUser);
-        $objFilter->SQL = 'SELECT file.*, sections.ID as SECTION_ID, sections.CATEGORY_ENG as SECTION_NAME,  category.CATEGORY_ENG
+        $objFilter->SQL = 'SELECT file.*, sections.ID as SECTION_ID, sections.CATEGORY_ENG as SECTION_NAME,  category.CATEGORY_ENG 
             FROM ' . $this->dm__files . ' file
             LEFT JOIN ' . $this->dm__category . ' sections ON sections.ID = file.SECTION_ID
             LEFT JOIN ' . $this->dm__category . ' category ON category.ID = file.CATEGORY_ID
-            WHERE file.STATUS = 1
-            ORDER BY file.ID DESC';
+            WHERE file.STATUS = 1 AND file.UPDATED_AT IS NOT NULL
+            ORDER BY file.UPDATED_AT DESC';
         $objFilter->executeMyQuery();
         //  echo $objFilter->PREPARED_SQL; //exit;
         $arr_accessLevel = array('1' => 'Public', '2' => 'Private', '3' => 'Both');
@@ -428,17 +431,18 @@ class Dms__moderator__m extends CI_Model
     }
 
 
-    function formatDateTime($updatedAt) {
+    function formatDateTime($updatedAt)
+    {
         // Get current time and the time of the updated post
         $currentTime = new DateTime();
         $postTime = new DateTime($updatedAt);
-    
+
         // Calculate the time difference
         $interval = $currentTime->diff($postTime);
-    
+
         // Convert the time difference into total minutes and hours
         $totalMinutes = ($interval->days * 24 * 60) + ($interval->h * 60) + $interval->i;
-    
+
         if ($totalMinutes < 60) {
             // If less than 1 hour, show minutes ago
             return $totalMinutes . ' minutes ago';
