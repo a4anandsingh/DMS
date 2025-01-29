@@ -91,12 +91,12 @@ class Dms__fileupload__m extends CI_Model
     private function showButton($id, $status)
     {
         $fileStatus = $this->getWebsiteStatus(0);
-        /*   if (array_key_exists($status, $fileStatus)) {
+        if (array_key_exists($status, $fileStatus)) {
             return getButton($fileStatus[$status], 'Active(2,' . $id . ')', 4, '');
-        } */
-
+        }
+        exit;
         /*Start 09-02-2022*/
-        if ($status == 1) {
+        /*         if ($status == 1) {
             return getButton('Published', '');
         }
         if ($status == 3) {
@@ -104,9 +104,11 @@ class Dms__fileupload__m extends CI_Model
         }
         if ($status == 4) {
             return getButton('Under Review', 'Active(4,' . $id . ')', 4, '');
+        } if ($status == 5) {
+            return getButton('Reverted by Moderator', 'Active(4,' . $id . ')', 4, '');
         } else {
             return getButton('UnPublished', 'Active(4,' . $id . ')', 4, '');
-        }
+        } */
         /*End 09-02-2022*/
     }
     public function getPublishedByUser($userId)
